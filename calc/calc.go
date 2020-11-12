@@ -1,6 +1,8 @@
 // calc package includes calculation of investment result simulation.
 package calc
 
+import "fmt"
+
 const (
 	domesticFeesPerTransaction               float64 = 0.45      // Represented by percentage.
 	maxDomesticFees                          float64 = 20        // Dollar.
@@ -19,6 +21,15 @@ type InvestResult struct {
 	AssetGrowthRate         float64 `json:"asset_growth_rate"`
 }
 
+// DisplayResult displays members of InvestResult struct.
+func (result *InvestResult) DisplayResult() {
+	fmt.Printf("NumberOfSharesPurchased: %.2f\n", result.NumberOfSharesPurchased)
+	fmt.Printf("RateOfUp: %.2f\n", result.RateOfUp)
+	fmt.Printf("ProfitAfterTax: %.2f\n", result.ProfitAfterTax)
+	fmt.Printf("TaxAndFee: %.2f\n", result.TaxAndFee)
+	fmt.Printf("TotalAssets: %.2f\n", result.TotalAssets)
+}
+
 // New initializes InvestResult struct.
 func New(investmentAmount, purchasePrice, salePrice float64) *InvestResult {
 	numberOfSharesPurchased := investmentAmount / purchasePrice
@@ -27,11 +38,11 @@ func New(investmentAmount, purchasePrice, salePrice float64) *InvestResult {
 	valuation := rateOfUp * investmentAmount
 	profitBeforeTax := valuation - investmentAmount
 
-	domesticFees := calcDomesticFees(investmentAmount)
+	domesticFees := 2 * calcDomesticFees(investmentAmount)
 	fee := domesticFees + (localTransactionCostsPerOneContractPrice * numberOfSharesPurchased)
-	tax := 1 - transferProfitTaxation
+	tax := profitBeforeTax * transferProfitTaxation
 	taxAndFee := tax + fee
-	profitAfterTax := (profitBeforeTax - fee) * tax
+	profitAfterTax := profitBeforeTax - taxAndFee
 
 	totalAssets := investmentAmount + profitAfterTax
 	assetGrowthRate := totalAssets / investmentAmount
